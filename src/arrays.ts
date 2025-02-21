@@ -31,7 +31,11 @@ export function tripleNumbers(numbers: number[]): number[] {
 export function stringsToIntegers(numbers: string[]): number[] {
     let s2I: number[] = [];
 
-    s2I = numbers.map((int: string): number => (isNaN(Number(int)) ? +int : 0));
+    s2I = [
+        ...numbers.map((int: string): number =>
+            isNaN(parseInt(int)) ? 0 : parseInt(int),
+        ),
+    ];
 
     return s2I;
 }
@@ -47,7 +51,7 @@ export const removeDollars = (amounts: string[]): number[] => {
     let removedDollars: string[] = [...amounts];
 
     removedDollars = removedDollars.map((num: string): string =>
-        num.slice(1, num.length - 1),
+        num[0] === "$" ? num.slice(1) : num,
     );
 
     return stringsToIntegers(removedDollars);
@@ -61,7 +65,13 @@ export const removeDollars = (amounts: string[]): number[] => {
 export const shoutIfExclaiming = (messages: string[]): string[] => {
     let theShouter: string[] = [...messages];
 
-    theShouter = theShouter.filter((str: string): string => thing);
+    theShouter = theShouter.filter(
+        (str: string): boolean => str[str.length - 1] !== "?",
+    );
+
+    theShouter = theShouter.map((str: string): string =>
+        str[str.length - 1] === "!" ? str.toUpperCase() : str,
+    );
 
     return theShouter;
 };
@@ -71,7 +81,11 @@ export const shoutIfExclaiming = (messages: string[]): string[] => {
  * 4 letters long.
  */
 export function countShortWords(words: string[]): number {
-    return 0;
+    let shortWords: string[] = [
+        ...words.filter((str: string): boolean => str.length < 4),
+    ];
+
+    return shortWords.length;
 }
 
 /**
@@ -80,7 +94,20 @@ export function countShortWords(words: string[]): number {
  * then return true.
  */
 export function allRGB(colors: string[]): boolean {
-    return false;
+    if (colors.length == 0) {
+        return true;
+    } else {
+        let clonedRGB: string[] = [...colors];
+        let onlyRGB: boolean = true;
+
+        clonedRGB.map((str: string): boolean =>
+            !"REDBLUEGREEN".includes(str.toUpperCase()) ?
+                (onlyRGB = false)
+            :   true,
+        );
+
+        return onlyRGB;
+    }
 }
 
 /**
@@ -91,7 +118,24 @@ export function allRGB(colors: string[]): boolean {
  * And the array [] would become "0=0".
  */
 export function makeMath(addends: number[]): string {
-    return "";
+    if (addends.length != 0) {
+        let added: number[] = [...addends];
+        let sum: number = 0;
+
+        added.map((num: number): number => (sum += num));
+
+        let addedString: string = sum.toString() + "=";
+
+        added.map((num: number): string =>
+            added[added.length - 1] === num ?
+                (addedString += num.toString())
+            :   (addedString += num.toString() + "+"),
+        );
+
+        return addedString;
+    } else {
+        return "0=0";
+    }
 }
 
 /**
@@ -104,5 +148,26 @@ export function makeMath(addends: number[]): string {
  * And the array [1, 9, 7] would become [1, 9, 7, 17]
  */
 export function injectPositive(values: number[]): number[] {
-    return [];
+    let newValues: number[] = [...values];
+    let firstNegativeIndex: number = -1;
+    let i = 0;
+    let sum: number = 0;
+
+    newValues.map((num: number): number =>
+        num < 0 && firstNegativeIndex === -1 ? (firstNegativeIndex = i) : i++,
+    );
+
+    if (firstNegativeIndex >= 0) {
+        newValues
+            .slice(0, firstNegativeIndex)
+            .map((num: number): number => (sum += num));
+        firstNegativeIndex++;
+    } else {
+        newValues.map((num: number): number => (sum += num));
+        firstNegativeIndex = newValues.length;
+    }
+
+    newValues.splice(firstNegativeIndex, 0, sum);
+
+    return newValues;
 }
